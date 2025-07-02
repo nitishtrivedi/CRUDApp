@@ -33,10 +33,10 @@ namespace CRUDApp.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var newEmployee = await _employeeRepository.AddAsync(employee);
-            return CreatedAtAction(nameof(GetEmployeeById), new {Id = employee.Id}, newEmployee);
+            return CreatedAtAction(nameof(GetEmployeeById), new {id = employee.Id}, newEmployee);
         }
 
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> EditEmployee([FromBody] Employee employee, int id)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
