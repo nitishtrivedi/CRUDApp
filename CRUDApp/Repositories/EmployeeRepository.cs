@@ -36,6 +36,15 @@ namespace CRUDApp.Repositories
             if (id != employee.Id) return false;
             var existingEmployee = await _dbContext.Employees.FindAsync(id);
             if (existingEmployee == null) return false;
+
+            //Manually update fields
+            existingEmployee.FirstName = employee.FirstName;
+            existingEmployee.LastName = employee.LastName;
+            existingEmployee.Email = employee.Email;
+            existingEmployee.Department = employee.Department;
+            existingEmployee.ContactNumber = employee.ContactNumber;
+
+
             _dbContext.Entry(existingEmployee).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
             return true;

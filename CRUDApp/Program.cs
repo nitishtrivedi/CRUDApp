@@ -1,4 +1,5 @@
 using CRUDApp.Data;
+using CRUDApp.Middleware;
 using CRUDApp.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCustomRequestLogging();
 
 app.MapControllers();
 
