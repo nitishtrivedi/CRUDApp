@@ -9,5 +9,8 @@ namespace CRUDApp.Repositories
         Task<Employee> AddAsync(Employee employee);
         Task<bool> UpdateAsync(Employee employee, int id);
         Task<bool> DeleteAsync(int id);
+
+        //Introduced in API v2
+        Task<IEnumerable<Employee>> AddRangeAsync(IEnumerable<Employee> employees);
     }
 }

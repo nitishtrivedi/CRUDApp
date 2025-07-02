@@ -58,5 +58,12 @@ namespace CRUDApp.Repositories
             await _dbContext.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Employee>> AddRangeAsync(IEnumerable<Employee> employees)
+        {
+            _dbContext.Employees.AddRange(employees);
+            await _dbContext.SaveChangesAsync();
+            return employees;
+        }
     }
 }
