@@ -1,10 +1,11 @@
 ﻿using CRUDApp.Data;
+using CRUDApp.DTOs;
 using CRUDApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUDApp.Repositories
 {
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository, IEmployeeRepositoryV2
     {
         private readonly AppDBContext _dbContext;
         public EmployeeRepository(AppDBContext dBContext)
@@ -12,9 +13,14 @@ namespace CRUDApp.Repositories
             _dbContext = dBContext;
         }
 
-        public async Task<IEnumerable<Employee>> GetAllAsync()
+        public async Task<IEnumerable<Employee>> GetAllAsync(string department)
         {
-            var employees = await _dbContext.Employees.AsNoTracking().ToListAsync();
+            department = department.ToLower();
+            IEnumerable<Employee> employees = string.IsNullOrWhiteSpace(department) ?
+                await _dbContext.Employees.AsNoTracking().ToListAsync()
+                : 
+                await _dbContext.Employees.Where(e =>  e.Department.ToLower() == department).AsNoTracking().ToListAsync();
+                ;
             return employees;
         }
 
@@ -65,5 +71,31 @@ namespace CRUDApp.Repositories
             await _dbContext.SaveChangesAsync();
             return employees;
         }
+
+        public async Task<IEnumerable<DepartmentSummaryDto>> GetDepartmentSummaryAsync(int minCount = 3)
+        {
+            //Get all records first
+            var employees = await _dbContext.Employees.AsNoTracking().ToListAsync();
+
+            return employees
+                .GroupBy(e => e.Department)
+                .Where(g => g.Count() >= minCount)
+                .Select(g => new DepartmentSummaryDto
+                {
+                    Department = g.Key,
+                    Count = g.Count(),
+                    Employees = g.Where(e => !string.IsNullOrWhiteSpace(e.Email))
+                                .OrderBy(e => e.LastName)
+                                .ThenBy(e => e.FirstName)
+                                .ToList()
+                }).ToList();
+        }
+
+
+        //public async Task<IEnumerable<Employee>> GetByDepartmentASync(string department)
+        //{
+        //    var employees = await _dbContext.Employees.Where(e => e.Department == department).ToListAsync();
+        //    return employees;
+        //}
     }
 }

@@ -11,16 +11,18 @@ namespace CRUDApp.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
-        public EmployeesController(IEmployeeRepository employeeRepository)
+        private readonly IEmployeeRepositoryV2 _employeeRepositoryV2;
+        public EmployeesController(IEmployeeRepository employeeRepository, IEmployeeRepositoryV2 employeeRepositoryV2)
         {
             _employeeRepository = employeeRepository;
+            _employeeRepositoryV2 = employeeRepositoryV2;
         }
 
         [HttpGet]
         [MapToApiVersion("1.0"), MapToApiVersion("2.0")] //Compatible to both versions
-        public async Task<IActionResult> GetEmployees()
+        public async Task<IActionResult> GetEmployees([FromQuery] string? department)
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            var employees = await _employeeRepository.GetAllAsync(department);
             return Ok(employees);
         }
         [HttpGet("{id:int}")]
@@ -45,7 +47,7 @@ namespace CRUDApp.Controllers
         public async Task<IActionResult> AddEmployeesBulk([FromBody] IEnumerable<Employee> employees)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var added = await _employeeRepository.AddRangeAsync(employees);
+            var added = await _employeeRepositoryV2.AddRangeAsync(employees);
             return StatusCode(StatusCodes.Status201Created, added);
         }
 
@@ -67,6 +69,32 @@ namespace CRUDApp.Controllers
             var success = await _employeeRepository.DeleteAsync(id);
             if (!success) return BadRequest(new { Message = $"Employee with ID: {id} could not be deleted or was not found" });
             return Ok(new {Message = $"Employee with ID: {id} deleted successfully"});
+        }
+
+
+        //API V2 METHODS:
+        //[HttpGet]
+        //[MapToApiVersion("1.0") ,MapToApiVersion("2.0")]
+        //public async Task<IActionResult> GetEmployeesByDepartment([FromQuery] string? department)
+        //{
+        //    IEnumerable<Employee> result;
+        //    if (string.IsNullOrWhiteSpace(department))
+        //    {
+        //        result = await _employeeRepository.GetAllAsync();
+        //    }
+        //    else
+        //    {
+        //        result = await _employeeRepository.GetByDepartmentASync(department);
+        //    }
+        //    return Ok(result);
+        //}
+
+        [HttpGet("summary")]
+        [MapToApiVersion("2.0")]
+        public async Task<IActionResult> GetDepartmentSummaryAsync([FromQuery] int minCount = 3)
+        {
+            var summary = await _employeeRepositoryV2.GetDepartmentSummaryAsync(minCount);
+            return Ok(summary);
         }
     }
 }
