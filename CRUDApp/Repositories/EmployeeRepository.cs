@@ -16,11 +16,9 @@ namespace CRUDApp.Repositories
         public async Task<IEnumerable<Employee>> GetAllAsync(string department)
         {
             department = department.ToLower();
-            IEnumerable<Employee> employees = string.IsNullOrWhiteSpace(department) ?
-                await _dbContext.Employees.AsNoTracking().ToListAsync()
-                : 
-                await _dbContext.Employees.Where(e =>  e.Department.ToLower() == department).AsNoTracking().ToListAsync();
-                ;
+            IEnumerable<Employee> employees = string.IsNullOrWhiteSpace(department) 
+                ? await _dbContext.Employees.AsNoTracking().ToListAsync()
+                : await _dbContext.Employees.Where(e => e.Department.Equals(department, StringComparison.CurrentCultureIgnoreCase)).AsNoTracking().ToListAsync();
             return employees;
         }
 

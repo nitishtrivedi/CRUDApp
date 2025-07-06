@@ -6,5 +6,6 @@ namespace CRUDApp.Data
     public class AppDBContext(DbContextOptions<AppDBContext> options) : DbContext(options)
     {
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

@@ -8,15 +8,10 @@ namespace CRUDApp.Controllers
     [ApiVersion("1.0")] //Added versioning
     [ApiVersion("2.0")] //Added versioning
     [Route("api/v{version:apiVersion}/[controller]")] //Updated route to include versioning
-    public class EmployeesController : ControllerBase
+    public class EmployeesController(IEmployeeRepository employeeRepository, IEmployeeRepositoryV2 employeeRepositoryV2) : ControllerBase
     {
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IEmployeeRepositoryV2 _employeeRepositoryV2;
-        public EmployeesController(IEmployeeRepository employeeRepository, IEmployeeRepositoryV2 employeeRepositoryV2)
-        {
-            _employeeRepository = employeeRepository;
-            _employeeRepositoryV2 = employeeRepositoryV2;
-        }
+        private readonly IEmployeeRepository _employeeRepository = employeeRepository;
+        private readonly IEmployeeRepositoryV2 _employeeRepositoryV2 = employeeRepositoryV2;
 
         [HttpGet]
         [MapToApiVersion("1.0"), MapToApiVersion("2.0")] //Compatible to both versions
